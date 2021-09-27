@@ -17,6 +17,13 @@ NodeJS Installation
 npm i node-ws-packets
 ```
 
+# Browser Support
+For browser support we pre-packed the Client.js and Packet.js. You can import the file below into your html project and use it like you would in a node environment.
+**Note:** The Server is not available in this script. Further - you can use the module with webpack and we recommend to do so.
+```html
+<script src="https://unpkg.com/node-ws-packets@latest/Browser.js" type="text/javascript"></script>
+```
+
 # Usage
 ### Import
 with Common JS
