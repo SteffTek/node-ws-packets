@@ -1,4 +1,10 @@
 
+[![Discord](https://img.shields.io/discord/803319138260090910?color=%237289DA&label=Discord)](https://discord.gg/Qgv8DSMYM3) 
+![License](https://img.shields.io/github/license/SteffTek/node-ws-packets) 
+[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/stefftek/node-ws-packets)](https://github.com/SteffTek/node-ws-packets) 
+[![GitHub issues](https://img.shields.io/github/issues/stefftek/node-ws-packets)](https://github.com/SteffTek/node-ws-packets/issues) 
+![Build](https://img.shields.io/github/workflow/status/SteffTek/node-ws-packets/Node.js%20Package)
+
 # node-ws-packets
 **A packet-based javascript websocket communitcation.**
 
