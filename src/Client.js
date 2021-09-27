@@ -151,7 +151,7 @@ class Client {
     handle(received) {
         try {
             // Get JSON from received data
-            let json = JSON.parse(received);
+            let json = JSON.parse((received.data ? received.data : received));
 
             // Parse packet from data
             const packet = this.decode(json);

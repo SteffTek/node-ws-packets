@@ -51,4 +51,4 @@ const Ping = require("./example/Ping");
 
 // Add Packet to Managers
 pm.addPacket(new Ping());
-cm.addPacket(new Ping());
+//cm.addPacket(new Ping());
