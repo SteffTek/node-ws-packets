@@ -19,6 +19,7 @@ const pm = new Server(wss, {log: true});
 pm.onConnect((ws) => {
     // Send Test Packet
     ws.sendPacket(new Ping({timestamp: Date.now()}));
+    wss.close();
 });
 // Add Disconnection Handler to each new client
 pm.onDisconnect((ws) => {
@@ -38,8 +39,8 @@ const cm = new Client(ws, {log: true});
  */
 cm.onConnect((ws) => {
     console.log("client", "I have connected!");
-
-    ws.sendPacket(new Ping({timestamp: Date.now()}))
+    ws.sendPacket(new Ping({timestamp: Date.now()}));
+    ws.close();
 });
 cm.onDisconnect((ws) => {
     console.log("client", "I have disconnected!");
@@ -51,4 +52,4 @@ const Ping = require("./example/Ping");
 
 // Add Packet to Managers
 pm.addPacket(new Ping());
-//cm.addPacket(new Ping());
+cm.addPacket(new Ping());
