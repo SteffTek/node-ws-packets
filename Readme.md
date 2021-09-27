@@ -5,6 +5,12 @@
 # About
 To simplify and streamline the process of handling, sending and receiving data, node-ws-packets was created. It's useful for live communitaction between multiple clients, like in browser games.
 
+Packets are validated with [Node Data Validator](https://www.npmjs.com/package/node-data-validator). If a packet fails validation (model and payload fail to compare) the packet will be **dropped**!
+
+There are 2 main components to this module. The handlers (Client or Server) and the packets. Packets are created from a base packet class that handels validation and some base functionality. The handlers handle incomming packets and execute them, if the payload data matches the local defined model. The Model is **not** transmitted over the network.
+
+The server handler also handels client id generation for identification of clients. The uuid module is used for this id generation.
+
 # Installation
 NodeJS Installation
 ```
@@ -30,7 +36,7 @@ import { Packet, Server, Client } from "node-ws-packets";
 /*
     IMPORTS
 */
-const { Packet, Server, Client } = require("node-ws-packets");
+const { Server } = require("node-ws-packets");
 
 /*
     Create Server
@@ -49,7 +55,7 @@ serverManager.addPacket(new Ping());
 
 // Executed on every client that connects
 serverManager.onConnect((ws) => {
-    // Send Test Packet
+    // Send Test Packet after client connected
     ws.sendPacket(new Ping({timestamp: Date.now()}));
 });
 
@@ -70,7 +76,7 @@ serverManager.broadcast(/*Packet*/);
 /*
     IMPORTS
 */
-const { Packet, Server, Client } = require("node-ws-packets");
+const { Client } = require("node-ws-packets");
 
 /*
     Client
@@ -99,12 +105,15 @@ clientManager.onDisconnect((ws) => {
 
 ```
 
+### Wrapper Function
+`ws.sendPacket(new Packet)` is a wrapper for sending packets directrly from the WebSocket connection. It is implemented on client and server WebSocket connections. Using `ws.send` can break the sending and receiving of packets.
+
 ### Creating a packet
 ```js
 /*
     IMPORTS
 */
-const { Packet, Server, Client } = require("node-ws-packets");
+const { Packet } = require("node-ws-packets");
 
 /*
     Create Packet
