@@ -2,7 +2,7 @@
   "name": "node-ws-packets",
   "version": "1.0.0",
   "description": "",
-  "main": "test.js",
+  "main": "Packets.js",
   "scripts": {
     "test": "node test.js",
     "dts": "tsc Packets.js --declaration --allowJs --emitDeclarationOnly --outDir types",
