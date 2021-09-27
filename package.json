@@ -1,0 +1,17 @@
+{
+  "name": "node-ws-packets",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "scripts": {
+    "test": "nodemon test.js",
+    "dts": "tsc Packets.js --declaration --allowJs --emitDeclarationOnly --outDir types"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "node-data-validator": "^1.1.1",
+    "uuid": "^8.3.2",
+    "ws": "^8.2.2"
+  }
+}
