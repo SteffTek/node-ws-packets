@@ -1,7 +1,7 @@
 {
   "name": "node-ws-packets",
-  "version": "1.0.1",
-  "description": "",
+  "version": "1.0.2",
+  "description": "A packet-based javascript websocket communitcation. ",
   "main": "Packets.js",
   "scripts": {
     "test": "node test.js",
