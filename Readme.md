@@ -146,13 +146,13 @@ A Server or Client can accept the following options.
 
 ### Packet
 A packet is always structured in the same way.
-```json
+```js
 PacketName {
   name: 'PacketName',
   payload: { PacketData },
   model: { PacketModel },
   isValid: true,
-  sender: Sender ID
+  sender: SenderID
 }
 ```
 
