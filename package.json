@@ -1,6 +1,6 @@
 {
   "name": "node-ws-packets",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "Packets.js",
   "scripts": {
@@ -8,7 +8,8 @@
     "dts": "tsc Packets.js --declaration --allowJs --emitDeclarationOnly --outDir types",
     "pack": "webpack"
   },
-  "author": "",
+  "types": "types/Packets.d.ts",
+  "author": "SteffTek",
   "license": "Apache-2.0",
   "dependencies": {
     "node-data-validator": "^1.1.1",
@@ -20,5 +21,13 @@
     "terser-webpack-plugin": "^5.2.4",
     "webpack": "^5.54.0",
     "webpack-cli": "^4.8.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SteffTek/node-ws-packets.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SteffTek/node-ws-packets/issues"
+  },
+  "homepage": "https://github.com/SteffTek/node-ws-packets#readme"
 }
