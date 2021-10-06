@@ -51,7 +51,17 @@ class Server {
             if(this.log) console.log("New client connected");
 
             // Assign IP for easy access
-            ws.ip = req.headers['x-forwarded-for']?.split(/\s*,\s*/)[0] || req.socket.remoteAddress;
+            let ip = null;
+
+            // Get IP
+            if(req.headers['x-forwarded-for']) {
+                ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]
+            } else {
+                ip = req.socket.remoteAddress;
+            }
+
+            // Set IP
+            ws.ip = ip;
             
             // Attach functions for client socket
             ws.sendPacket = (packet) => {
