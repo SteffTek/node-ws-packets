@@ -8,10 +8,11 @@ declare class Server {
      * @param {object} wss websocket server
      * @param {object} options options
      */
-    constructor(wss: object, { log }?: object);
+    constructor(wss: object, { log, reportBroken }?: object);
     /**
      * Manager Public Vars
      */
+    reportBroken: any;
     log: any;
     wss: any;
     /**

@@ -2,6 +2,7 @@
  * Imports
  */
 const { v4: uuid } = require("uuid");
+const url = require("url");
 
 /**
  * Packet Manager Class
@@ -12,13 +13,14 @@ class Server {
      * @param {object} wss websocket server
      * @param {object} options options
      */
-    constructor(wss, {log = false} = {}) {
+    constructor(wss, {log = false, reportBroken = false} = {}) {
         /**
          * Manager Public Vars
          */
+        this.reportBroken = reportBroken;
         this.log = log;
         this.wss = wss;
-        
+
         /**
          * Create ID
          */
@@ -62,7 +64,18 @@ class Server {
 
             // Set IP
             ws.ip = ip;
-            
+
+            // Set Request
+            ws.req = req;
+
+            // Get Query Params from URL
+            try {
+                ws.req.query = Object.assign({}, url.parse(req.url, true).query);
+            } catch(e) {
+                // Set empty query
+                ws.req.query = {};
+            }
+
             // Attach functions for client socket
             ws.sendPacket = (packet) => {
                 // Decode Packet to JSON
@@ -112,14 +125,14 @@ class Server {
     /**
      * PACKET REGISTERING
      */
-    
+
     /**
      * Registers a packet
      * @param {object} packet packet
      * @returns {object} packet client
      */
     addPacket(packet) {
-        
+
         // Get vars out of packet class
         const packetClass = packet.constructor;
         const name = packet.name;
@@ -197,10 +210,17 @@ class Server {
             packet.isValid = packet.validate();
 
             // Check validity
-            if(packet.isValid) {
-                packet.handle(ws);
+            if(!packet.isValid) {
+                // Log broken packet
+                if(this.reportBroken) {
+                    console.error(`Packet '${packet.name}' received in broken state!`);
+                    console.log(packet);
+                }
+                return;
             }
 
+            // Handle packet
+            packet.handle(ws);
         } catch(e) {
             // Log Error
             if(this.log) console.error("Error while handling event", e);
