@@ -73,10 +73,14 @@ serverManager.onConnect((ws) => {
 });
 
 // Executed on every client that disconnects
-serverManager.onDisconnect((ws) => {
+serverManager.onDisconnect((ws, event) => {
     console.log("server", "Client has disconnected!");
 });
 
+// Executed on every error that a client encounters
+serverManager.onError((ws, error) => {
+    console.log(ws.id, error);
+});
 
 /*
     Broadcast Packets to all connected clients
@@ -112,7 +116,12 @@ clientManager.onConnect((ws) => {
 });
 
 // Executed on client disconnect
-clientManager.onDisconnect((ws) => {
+clientManager.onDisconnect((ws, event) => {
+    // Same as Server Manager
+});
+
+// Executed on client error
+serverManager.onError((ws, error) => {
     // Same as Server Manager
 });
 

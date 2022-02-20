@@ -22,6 +22,7 @@ declare class Client {
      * Callbacks
      */
     callbacks: {
+        onError: any[];
         onConnect: any[];
         onDisconnect: any[];
     };

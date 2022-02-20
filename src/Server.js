@@ -37,6 +37,7 @@ class Server {
          * Callbacks
          */
         this.callbacks = {
+            onError: [],
             onConnect: [],
             onDisconnect: []
         }
@@ -110,10 +111,17 @@ class Server {
             });
 
             // Close Handler
-            ws.on("close", () => {
-                // Go through all onConnect functions
+            ws.on("close", (event) => {
+                // Go through all onDisconnect functions
                 this.callbacks.onDisconnect.forEach(_function => {
-                    _function(ws);
+                    _function(ws, event);
+                });
+            });
+
+            ws.on("error", (error) => {
+                // Go through all onError functions
+                this.callbacks.onError.forEach(_function => {
+                    _function(ws, error);
                 });
             });
         });

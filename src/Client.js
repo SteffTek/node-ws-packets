@@ -20,23 +20,24 @@ class Client {
         this.packets = {
             /* NAME: PACKET OBJECT CLASS */
         }
- 
+
         /**
          * Callbacks
          */
         this.callbacks = {
+            onError: [],
             onConnect: [],
             onDisconnect: []
         }
-        
-         /**
-          * Init Websocket Listener
-          */
+
+        /**
+         * Init Websocket Listener
+         */
         const open = () => {
 
             // Log
             if(this.log) console.log("New connection established");
-            
+
             // Attach functions for client socket
             ws.sendPacket = (packet) => {
                 // Decode Packet to JSON
@@ -69,10 +70,18 @@ class Client {
         };
 
         // Close Handler
-        const close = () => {
+        const close = (event) => {
             // Go through all onConnect functions
             this.callbacks.onDisconnect.forEach(_function => {
-                _function(ws);
+                _function(ws, event);
+            });
+        };
+
+        // Error Handler
+        const error = (error) => {
+            // Go through all onError functions
+            this.callbacks.onError.forEach(_function => {
+                _function(ws, error);
             });
         };
 
@@ -80,11 +89,12 @@ class Client {
         (!ws.on ? ws.onopen = open : ws.on("open", open));
         (!ws.on ? ws.onclose = close : ws.on("close", close));
         (!ws.on ? ws.onmessage = message : ws.on("message", message));
+        (!ws.on ? ws.onerror = error : ws.on("error", error));
 
         // Log readieness
         if(this.log) console.log("PacketClient initialized!");
     }
- 
+
     /**
      * PACKET REGISTERING
      */
@@ -115,7 +125,7 @@ class Client {
         // Return client instance
         return this;
     }
-     
+
     /**
      * Removes a packet
      * @param {object} packet packet
@@ -146,7 +156,7 @@ class Client {
      * Handle incomming packets
      * @param {object} ws websocket client
      * @param {object} received received data
-     * @returns 
+     * @returns
      */
     handle(received) {
         try {
@@ -174,7 +184,7 @@ class Client {
             if(this.log) console.error("Error while handling event", e);
         }
     }
- 
+
     /**
      * Encoding & Decoding
      */
@@ -188,10 +198,10 @@ class Client {
         // Return packet json data
         return packet.json();
     }
- 
+
     /**
      * Returns packet from packet data
-     * @param {object} packetData 
+     * @param {object} packetData
      */
     decode(packetData) {
 
@@ -211,7 +221,7 @@ class Client {
         // Return Packet Data
         return Object.assign(new this.packets[packetData.name], packetData);
     }
- 
+
     /**
      * Utils
      */
@@ -227,7 +237,7 @@ class Client {
         // Return client
         return this;
     }
- 
+
     /**
      * Add Callback to connection close
      * @param {function} _function callback function
@@ -239,9 +249,9 @@ class Client {
         // Return client
         return this;
     }
- 
- }
- 
+
+}
+
 /**
  * Exports
  */

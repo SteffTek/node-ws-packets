@@ -27,6 +27,7 @@ declare class Server {
      * Callbacks
      */
     callbacks: {
+        onError: any[];
         onConnect: any[];
         onDisconnect: any[];
     };
