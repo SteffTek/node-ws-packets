@@ -227,8 +227,14 @@ class Client {
      */
 
     /**
+     * The callback type for connection handling
+     * @callback onConnectCallback
+     * @param {object} websocketConnection
+     */
+
+    /**
      * Add Callback to new Connection, executed on new connection
-     * @param {function} _function callback function
+     * @param {onConnectCallback} _function callback function
      * @returns {Client} client object
      */
     onConnect(_function) {
@@ -240,8 +246,15 @@ class Client {
     }
 
     /**
+     * The callback type for disconnection handling
+     * @callback onDisconnectCallback
+     * @param {object} websocketConnection
+     * @param {object} event
+     */
+
+    /**
      * Add Callback to connection close
-     * @param {function} _function callback function
+     * @param {onDisconnectCallback} _function callback function
      * @returns {Client} client object
      */
     onDisconnect(_function) {
@@ -253,8 +266,15 @@ class Client {
     }
 
     /**
+     * The callback type for error handling
+     * @callback onErrorCallback
+     * @param {object} websocketConnection
+     * @param {object} error
+     */
+
+    /**
      * Add Callback to connection error
-     * @param {function} _function callback function
+     * @param {onErrorCallback} _function callback function
      * @returns {Client} client object
      */
     onError(_function) {

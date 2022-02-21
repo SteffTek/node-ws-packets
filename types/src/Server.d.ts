@@ -76,21 +76,38 @@ declare class Server {
      */
     broadcast(packet: any): void;
     /**
-     * Add Callback to new Connection, executed on new connection
-     * @param {function} _function callback function
-     * @returns {Server} server
+     * The callback type for connection handling
+     * @callback onConnectCallback
+     * @param {object} websocketConnection
      */
-    onConnect(_function: Function): Server;
+    /**
+     * Add Callback to new Connection, executed on new connection
+     * @param {onConnectCallback} _function callback function
+     * @returns {Server} server object
+     */
+    onConnect(_function: (websocketConnection: object) => any): Server;
+    /**
+     * The callback type for disconnection handling
+     * @callback onDisconnectCallback
+     * @param {object} websocketConnection
+     * @param {object} event
+     */
     /**
      * Add Callback to connection close
-     * @param {function} _function callback function
-     * @returns {Server} server
+     * @param {onDisconnectCallback} _function callback function
+     * @returns {Server} server object
      */
-    onDisconnect(_function: Function): Server;
+    onDisconnect(_function: (websocketConnection: object, event: object) => any): Server;
+    /**
+     * The callback type for error handling
+     * @callback onErrorCallback
+     * @param {object} websocketConnection
+     * @param {object} error
+     */
     /**
      * Add Callback to connection error
-     * @param {function} _function callback function
-     * @returns {Server} server
+     * @param {onErrorCallback} _function callback function
+     * @returns {Server} server object
      */
-    onError(_function: Function): Server;
+    onError(_function: (websocketConnection: object, error: object) => any): Server;
 }

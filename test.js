@@ -22,9 +22,13 @@ pm.onConnect((ws) => {
     wss.close();
 });
 // Add Disconnection Handler to each new client
-pm.onDisconnect((ws) => {
-    console.log("server", "Client has disconnected!");
+pm.onDisconnect((ws, event) => {
+    console.log("server", "Client has disconnected!", event);
 });
+// Add Error Handler
+pm.onError((ws, error) => {
+    console.log(ws.id, error);
+})
 
 
 // Create WS Client for testing
