@@ -303,6 +303,7 @@ class Server {
     /**
      * Add Callback to new Connection, executed on new connection
      * @param {function} _function callback function
+     * @returns {Server} server object
      */
     onConnect(_function) {
         // Add to connection listener
@@ -315,10 +316,24 @@ class Server {
     /**
      * Add Callback to connection close
      * @param {function} _function callback function
+     * @returns {Server} server object
      */
     onDisconnect(_function) {
         // Add to connection listener
         this.callbacks.onDisconnect.push(_function);
+
+        // Return Server
+        return this;
+    }
+
+    /**
+     * Add Callback to connection error
+     * @param {function} _function callback function
+     * @returns {Server} server object
+     */
+    onError(_function) {
+        // Add to connection listener
+        this.callbacks.onError.push(_function);
 
         // Return Server
         return this;

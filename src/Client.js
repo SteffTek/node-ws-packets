@@ -229,6 +229,7 @@ class Client {
     /**
      * Add Callback to new Connection, executed on new connection
      * @param {function} _function callback function
+     * @returns {Client} client object
      */
     onConnect(_function) {
         // Add to connection listener
@@ -241,10 +242,24 @@ class Client {
     /**
      * Add Callback to connection close
      * @param {function} _function callback function
+     * @returns {Client} client object
      */
     onDisconnect(_function) {
         // Add to connection listener
         this.callbacks.onDisconnect.push(_function);
+
+        // Return client
+        return this;
+    }
+
+    /**
+     * Add Callback to connection error
+     * @param {function} _function callback function
+     * @returns {Client} client object
+     */
+    onError(_function) {
+        // Add to connection listener
+        this.callbacks.onError.push(_function);
 
         // Return client
         return this;

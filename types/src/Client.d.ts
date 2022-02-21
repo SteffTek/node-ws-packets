@@ -75,4 +75,9 @@ declare class Client {
      * @param {function} _function callback function
      */
     onDisconnect(_function: Function): Client;
+    /**
+     * Add Callback to connection error
+     * @param {function} _function callback function
+     */
+    onError(_function: Function): Client;
 }

@@ -78,11 +78,19 @@ declare class Server {
     /**
      * Add Callback to new Connection, executed on new connection
      * @param {function} _function callback function
+     * @returns {Server} server
      */
     onConnect(_function: Function): Server;
     /**
      * Add Callback to connection close
      * @param {function} _function callback function
+     * @returns {Server} server
      */
     onDisconnect(_function: Function): Server;
+    /**
+     * Add Callback to connection error
+     * @param {function} _function callback function
+     * @returns {Server} server
+     */
+    onError(_function: Function): Server;
 }
