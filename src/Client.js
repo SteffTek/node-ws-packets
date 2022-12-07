@@ -65,7 +65,7 @@ class Client {
                 this.handle(message);
             } catch(e) {
                 // Log error
-                if(this.log) console.error("Error on incomming message!", e);
+                if(this.log) console.error("Error on incoming message!", e);
             }
         };
 
@@ -153,7 +153,7 @@ class Client {
     }
 
     /**
-     * Handle incomming packets
+     * Handle incoming packets
      * @param {object} ws websocket client
      * @param {object} received received data
      * @returns
