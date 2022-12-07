@@ -106,7 +106,7 @@ class Server {
                     this.handle(ws, message);
                 } catch(e) {
                     // Log error
-                    if(this.log) console.error("Error on incomming message!", e);
+                    if(this.log) console.error("Error on incoming message!", e);
                 }
             });
 
@@ -188,7 +188,7 @@ class Server {
     }
 
     /**
-     * Handle incomming packets
+     * Handle incoming packets
      * @param {object} ws websocket client
      * @param {object} received received data
      * @returns 
@@ -292,7 +292,7 @@ class Server {
         this.wss.clients.forEach((client) => {
 
             // Check if client is ready
-            if(client.readyStae === 1) {
+            if(client.readyState === 1) {
 
                 // Send JSON
                 client.send(JSON.stringify(json));
