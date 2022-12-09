@@ -42,7 +42,7 @@ declare class Client {
      */
     removePacket(packet: object): object;
     /**
-     * Handle incomming packets
+     * Handle incoming packets
      * @param {object} ws websocket client
      * @param {object} received received data
      * @returns
