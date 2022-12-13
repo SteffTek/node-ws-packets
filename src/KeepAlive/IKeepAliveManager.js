@@ -23,9 +23,6 @@ class IKeepAliveManager {
             return;
         }
 
-        /* Check if Server */
-        //if(packetManager instanceof Server) return;
-
         /** Do Server Stuff */
         packetManager.addPacket(new SKeepAlivePacket());
     }
@@ -37,6 +34,9 @@ class IKeepAliveManager {
     onConnect(wsClient) {
         // Add this manager to client
         wsClient.__keepAliveManager = this;
+        wsClient.__keepAliveHandler = () => {
+            this.receivePing(wsClient);
+        };
         // Start Timer
         this.sendPing(wsClient);
     }
@@ -74,7 +74,7 @@ class IKeepAliveManager {
         // Wait for interval and send new ping
         wsClient.__keepAliveTimeout = setTimeout(() => {
             this.sendPing(wsClient);
-        }, keepAliveInterval * 1000 /* Seconds */);
+        }, this.__keepAliveInterval * 1000 /* Seconds */);
     }
 }
 

@@ -1,6 +1,10 @@
-export = IKeepALiveManager;
-declare class IKeepALiveManager {
-    constructor(packetManager: any, { keepAliveTimeout, keepAliveInterval }?: {
+export = IKeepAliveManager;
+/**
+ * Create Manager
+ * @param {object} packetManager server or client packet manager
+ */
+declare class IKeepAliveManager {
+    constructor(packetManager: any, isClient?: boolean, { keepAliveTimeout, keepAliveInterval }?: {
         keepAliveTimeout?: number;
         keepAliveInterval?: number;
     });

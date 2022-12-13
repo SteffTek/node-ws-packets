@@ -28,8 +28,10 @@ pm.onDisconnect((ws, event) => {
 // Add Error Handler
 pm.onError((ws, error) => {
     console.log(ws.id, error);
-})
-
+});
+pm.onInvalid((ws, packet) => {
+    console.log(ws.id, packet);
+});
 
 // Create WS Client for testing
 const ws = new WebSocket("ws://localhost:8080/?test=test");
@@ -48,6 +50,13 @@ cm.onConnect((ws) => {
 });
 cm.onDisconnect((ws) => {
     console.log("client", "I have disconnected!");
+});
+// Add Error Handler
+pm.onError((ws, error) => {
+    console.log(error);
+});
+cm.onInvalid((ws, packet) => {
+    console.log(packet);
 });
 
 

@@ -26,7 +26,7 @@ module.exports = class SKeepAlivePacket extends Packet {
      * @param {object} ws websocket connection
      */
     handle(ws) {
-        
-        console.log(this.payload);
+        // Reset Disconnect Timer
+        ws.__keepAliveHandler();
     }
 }

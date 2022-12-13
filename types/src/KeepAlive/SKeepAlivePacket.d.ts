@@ -1,5 +1,5 @@
-export = CKeepAlivePacket;
-declare class CKeepAlivePacket extends Packet {
+export = SKeepAlivePacket;
+declare class SKeepAlivePacket extends Packet {
     constructor(payload: any);
 }
 import Packet = require("../Packet.js");
