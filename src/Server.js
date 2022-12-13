@@ -3,6 +3,7 @@
  */
 const { v4: uuid } = require("uuid");
 const url = require("url");
+const IKeepAliveManager = require("./KeepAlive/IKeepAliveManager.js");
 
 /**
  * Packet Manager Class
@@ -13,13 +14,13 @@ class Server {
      * @param {object} wss websocket server
      * @param {object} options options
      */
-    constructor(wss, {log = false, reportBroken = false} = {}) {
+    constructor(wss, { log = false, keepAlive = false, keepAliveTimeout = 60, keepAliveInterval = 30 } = {}) {
         /**
          * Manager Public Vars
          */
-        this.reportBroken = reportBroken;
         this.log = log;
         this.wss = wss;
+        this.keepAlive = keepAlive;
 
         /**
          * Create ID
@@ -39,8 +40,14 @@ class Server {
         this.callbacks = {
             onError: [],
             onConnect: [],
-            onDisconnect: []
+            onDisconnect: [],
+            onInvalid: []
         }
+
+        /**
+         * Create Keep Alive Timer
+         */
+        this.__keepAliveManager = new IKeepAliveManager(this, false, { keepAliveTimeout, keepAliveInterval });
 
         /**
          * Init Websocket Listener
@@ -51,13 +58,13 @@ class Server {
             ws.id = uuid();
 
             // Log
-            if(this.log) console.log("New client connected");
+            if (this.log) console.log("New client connected");
 
             // Assign IP for easy access
             let ip = null;
 
             // Get IP
-            if(req.headers['x-forwarded-for']) {
+            if (req.headers['x-forwarded-for']) {
                 ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]
             } else {
                 ip = req.socket.remoteAddress;
@@ -72,7 +79,7 @@ class Server {
             // Get Query Params from URL
             try {
                 ws.req.query = Object.assign({}, url.parse(req.url, true).query);
-            } catch(e) {
+            } catch (e) {
                 // Set empty query
                 ws.req.query = {};
             }
@@ -89,7 +96,7 @@ class Server {
                 delete json.model;
 
                 // Send
-                if(ws.readyState === 1)
+                if (ws.readyState === 1)
                     ws.send(JSON.stringify(json));
             }
 
@@ -104,9 +111,9 @@ class Server {
                 try {
                     // Handle message
                     this.handle(ws, message);
-                } catch(e) {
+                } catch (e) {
                     // Log error
-                    if(this.log) console.error("Error on incomming message!", e);
+                    if (this.log) console.error("Error on incomming message!", e);
                 }
             });
 
@@ -116,6 +123,8 @@ class Server {
                 this.callbacks.onDisconnect.forEach(_function => {
                     _function(ws, event);
                 });
+                // Clear KeepAliveTimer
+                this.__keepAliveManager.onDisconnect(ws);
             });
 
             ws.on("error", (error) => {
@@ -124,10 +133,15 @@ class Server {
                     _function(ws, error);
                 });
             });
+
+            // Add KeepAlive Manager
+            if (this.keepAlive) {
+                this.__keepAliveManager.onConnect(ws);
+            }
         });
 
         // Log readieness
-        if(this.log) console.log("PacketServer initialized!");
+        if (this.log) console.log("PacketServer initialized!");
     }
 
     /**
@@ -146,8 +160,8 @@ class Server {
         const name = packet.name;
 
         // Check for Packet
-        if(this.packets[name]) {
-            if(this.log) console.error(`Packet '${name}' already initialized!`);
+        if (this.packets[name]) {
+            if (this.log) console.error(`Packet '${name}' already initialized!`);
             return this;
         }
 
@@ -155,12 +169,12 @@ class Server {
         this.packets[name] = packetClass;
 
         // Log
-        if(this.log) console.log(`Packet '${name}' initialized!`);
+        if (this.log) console.log(`Packet '${name}' initialized!`);
 
         // Return client instance
         return this;
     }
-     
+
     /**
      * Removes a packet
      * @param {object} packet packet
@@ -172,8 +186,8 @@ class Server {
         const name = packet.name;
 
         // Check for Packet
-        if(!this.packets[name]) {
-            if(this.log) console.error(`Packet '${name}' not initialized!`);
+        if (!this.packets[name]) {
+            if (this.log) console.error(`Packet '${name}' not initialized!`);
             return this;
         }
 
@@ -181,7 +195,7 @@ class Server {
         delete this.packets[name];
 
         // Log
-        if(this.log) console.log(`Packet '${name}' removed!`);
+        if (this.log) console.log(`Packet '${name}' removed!`);
 
         // Return client instance
         return this;
@@ -202,7 +216,7 @@ class Server {
             json.sender = ws.id;
 
             // Check if sender === receiver => abort
-            if(json.sender === this.id) {
+            if (json.sender === this.id) {
                 return;
             }
 
@@ -210,7 +224,7 @@ class Server {
             const packet = this.decode(json);
 
             // Check if packet is registered
-            if(packet === null) {
+            if (packet === null) {
                 return;
             }
 
@@ -218,20 +232,20 @@ class Server {
             packet.isValid = packet.validate();
 
             // Check validity
-            if(!packet.isValid) {
+            if (!packet.isValid) {
                 // Log broken packet
-                if(this.reportBroken) {
-                    console.error(`Packet '${packet.name}' received in broken state!`);
-                    console.log(packet);
-                }
+                // Go through all onInvalid functions
+                this.callbacks.onInvalid.forEach(_function => {
+                    _function(ws, packet);
+                });
                 return;
             }
 
             // Handle packet
             packet.handle(ws);
-        } catch(e) {
+        } catch (e) {
             // Log Error
-            if(this.log) console.error("Error while handling event", e);
+            if (this.log) console.error("Error while handling event", e);
         }
     }
 
@@ -256,12 +270,12 @@ class Server {
     decode(packetData) {
 
         // Check for packet name
-        if(!packetData.name) {
+        if (!packetData.name) {
             return null;
         }
 
         // Check for packet in registered packets
-        if(!this.packets[packetData.name]) {
+        if (!this.packets[packetData.name]) {
             return null;
         }
 
@@ -292,7 +306,7 @@ class Server {
         this.wss.clients.forEach((client) => {
 
             // Check if client is ready
-            if(client.readyStae === 1) {
+            if (client.readyStae === 1) {
 
                 // Send JSON
                 client.send(JSON.stringify(json));
@@ -359,6 +373,25 @@ class Server {
         return this;
     }
 
+    /**
+     * The callback type for invalid packet handling
+     * @callback onInvalidCallback
+     * @param {object} websocketConnection
+     * @param {object} packet
+     */
+
+    /**
+     * Add Callback to invalid packet error
+     * @param {onInvalidCallback} _function callback function
+     * @returns {Server} server object
+     */
+    onInvalid(_function) {
+        // Add to connection listener
+        this.callbacks.onInvalid.push(_function);
+
+        // Return Server
+        return this;
+    }
 }
 
 /**

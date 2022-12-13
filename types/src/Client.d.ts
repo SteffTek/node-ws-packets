@@ -8,7 +8,7 @@ declare class Client {
      * @param {object} ws websocket client
      * @param {object} options options
      */
-    constructor(ws: object, { log }?: object);
+    constructor(ws: object, { log, keepAlive }?: object);
     /**
      * Manager Public Vars
      */
@@ -25,6 +25,7 @@ declare class Client {
         onError: any[];
         onConnect: any[];
         onDisconnect: any[];
+        onInvalid: any[];
     };
     /**
      * PACKET REGISTERING
@@ -100,4 +101,16 @@ declare class Client {
      * @returns {Client} client object
      */
     onError(_function: (websocketConnection: object, error: object) => any): Client;
+    /**
+     * The callback type for invalid packet handling
+     * @callback onInvalidCallback
+     * @param {object} websocketConnection
+     * @param {object} packet
+     */
+    /**
+     * Add Callback to invalid packet error
+     * @param {onInvalidCallback} _function callback function
+     * @returns {Client} client object
+     */
+    onInvalid(_function: (websocketConnection: object, packet: object) => any): Client;
 }

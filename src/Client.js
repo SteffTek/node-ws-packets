@@ -1,18 +1,24 @@
 /**
+ * Imports
+ */
+const IKeepAliveManager = require("./KeepAlive/IKeepAliveManager.js");
+
+/**
  * Packet Manager Class
  */
 class Client {
-     /**
-      * Create a new Manager instance
-      * @param {object} ws websocket client
-      * @param {object} options options
-      */
-     constructor(ws, {log = false} = {}) {
+    /**
+     * Create a new Manager instance
+     * @param {object} ws websocket client
+     * @param {object} options options
+     */
+    constructor(ws, { log = false, keepAlive = false } = {}) {
         /**
          * Manager Public Vars
          */
         this.log = log;
         this.ws = ws;
+        this.keepAlive = keepAlive;
 
         /**
          * Packets
@@ -27,8 +33,15 @@ class Client {
         this.callbacks = {
             onError: [],
             onConnect: [],
-            onDisconnect: []
+            onDisconnect: [],
+            onInvalid: []
         }
+
+        /**
+         * Create Keep Alive Timer
+         */
+         if(keepAlive)
+         this.__keepAliveManager = new IKeepAliveManager(this, true);
 
         /**
          * Init Websocket Listener
@@ -36,7 +49,7 @@ class Client {
         const open = () => {
 
             // Log
-            if(this.log) console.log("New connection established");
+            if (this.log) console.log("New connection established");
 
             // Attach functions for client socket
             ws.sendPacket = (packet) => {
@@ -47,7 +60,7 @@ class Client {
                 delete json.model;
 
                 // Send
-                if(ws.readyState === 1)
+                if (ws.readyState === 1)
                     ws.send(JSON.stringify(json));
             }
 
@@ -63,9 +76,9 @@ class Client {
             try {
                 // Handle message
                 this.handle(message);
-            } catch(e) {
+            } catch (e) {
                 // Log error
-                if(this.log) console.error("Error on incomming message!", e);
+                if (this.log) console.error("Error on incomming message!", e);
             }
         };
 
@@ -92,7 +105,7 @@ class Client {
         (!ws.on ? ws.onerror = error : ws.on("error", error));
 
         // Log readieness
-        if(this.log) console.log("PacketClient initialized!");
+        if (this.log) console.log("PacketClient initialized!");
     }
 
     /**
@@ -111,8 +124,8 @@ class Client {
         const name = packet.name;
 
         // Check for Packet
-        if(this.packets[name]) {
-            if(this.log) console.error(`Packet '${name}' already initialized!`);
+        if (this.packets[name]) {
+            if (this.log) console.error(`Packet '${name}' already initialized!`);
             return this;
         }
 
@@ -120,7 +133,7 @@ class Client {
         this.packets[name] = packetClass;
 
         // Log
-        if(this.log) console.log(`Packet '${name}' initialized!`);
+        if (this.log) console.log(`Packet '${name}' initialized!`);
 
         // Return client instance
         return this;
@@ -137,8 +150,8 @@ class Client {
         const name = packet.name;
 
         // Check for Packet
-        if(!this.packets[name]) {
-            if(this.log) console.error(`Packet '${name}' not initialized!`);
+        if (!this.packets[name]) {
+            if (this.log) console.error(`Packet '${name}' not initialized!`);
             return this;
         }
 
@@ -146,7 +159,7 @@ class Client {
         delete this.packets[name];
 
         // Log
-        if(this.log) console.log(`Packet '${name}' removed!`);
+        if (this.log) console.log(`Packet '${name}' removed!`);
 
         // Return client instance
         return this;
@@ -167,7 +180,11 @@ class Client {
             const packet = this.decode(json);
 
             // Check if packet is registered
-            if(packet === null) {
+            if (packet === null) {
+                // Go through all onInvalid functions
+                this.callbacks.onInvalid.forEach(_function => {
+                    _function(this.ws, json);
+                });
                 return;
             }
 
@@ -175,13 +192,21 @@ class Client {
             packet.isValid = packet.validate();
 
             // Check validity
-            if(packet.isValid) {
-                packet.handle(this.ws);
+            if (!packet.isValid) {
+                // Log broken packet
+                // Go through all onInvalid functions
+                this.callbacks.onInvalid.forEach(_function => {
+                    _function(this.ws, packet);
+                });
+                return;
             }
 
-        } catch(e) {
+            // Handle Packet
+            packet.handle(this.ws);
+
+        } catch (e) {
             // Log Error
-            if(this.log) console.error("Error while handling event", e);
+            if (this.log) console.error("Error while handling event", e);
         }
     }
 
@@ -206,12 +231,12 @@ class Client {
     decode(packetData) {
 
         // Check for packet name
-        if(!packetData.name) {
+        if (!packetData.name) {
             return null;
         }
 
         // Check for packet in registered packets
-        if(!this.packets[packetData.name]) {
+        if (!this.packets[packetData.name]) {
             return null;
         }
 
@@ -285,6 +310,25 @@ class Client {
         return this;
     }
 
+    /**
+     * The callback type for invalid packet handling
+     * @callback onInvalidCallback
+     * @param {object} websocketConnection
+     * @param {object} packet
+     */
+
+    /**
+     * Add Callback to invalid packet error
+     * @param {onInvalidCallback} _function callback function
+     * @returns {Client} client object
+     */
+    onInvalid(_function) {
+        // Add to connection listener
+        this.callbacks.onInvalid.push(_function);
+
+        // Return Client
+        return this;
+    }
 }
 
 /**

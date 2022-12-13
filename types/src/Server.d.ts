@@ -8,13 +8,16 @@ declare class Server {
      * @param {object} wss websocket server
      * @param {object} options options
      */
-    constructor(wss: object, { log, reportBroken }?: object);
+    constructor(wss: object, { log, keepAlive, keepAliveTimeout, keepAliveInterval }?: object);
     /**
      * Manager Public Vars
      */
-    reportBroken: any;
     log: any;
     wss: any;
+    /**
+     * Create Keep Alive Timer
+     */
+    __keepAliveManager: IKeepALiveManager;
     /**
      * Create ID
      */
@@ -30,6 +33,7 @@ declare class Server {
         onError: any[];
         onConnect: any[];
         onDisconnect: any[];
+        onInvalid: any[];
     };
     /**
      * PACKET REGISTERING
@@ -110,4 +114,17 @@ declare class Server {
      * @returns {Server} server object
      */
     onError(_function: (websocketConnection: object, error: object) => any): Server;
+    /**
+     * The callback type for invalid packet handling
+     * @callback onInvalidCallback
+     * @param {object} websocketConnection
+     * @param {object} packet
+     */
+    /**
+     * Add Callback to invalid packet error
+     * @param {onInvalidCallback} _function callback function
+     * @returns {Server} server object
+     */
+    onInvalid(_function: (websocketConnection: object, packet: object) => any): Server;
 }
+import IKeepALiveManager = require("./KeepAlive/IKeepAliveManager.js");

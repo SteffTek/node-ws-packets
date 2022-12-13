@@ -14,7 +14,7 @@ const wss = new WebSocketServer({
  * PACKET MANAGER SERVER
  */
 // Create Packet Manager
-const pm = new Server(wss, {log: true, reportBroken: true});
+const pm = new Server(wss, {log: true, keepAlive: true});
 // Add Connection Handler to each new client
 pm.onConnect((ws) => {
     // Send Test Packet
@@ -37,7 +37,7 @@ const ws = new WebSocket("ws://localhost:8080/?test=test");
 /**
  * PACKET MANAGER CLIENT
  */
-const cm = new Client(ws, {log: true});
+const cm = new Client(ws, {log: true,keepAlive: true});
 /**
  * Connection Events for client
  */
