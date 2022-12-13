@@ -13,7 +13,7 @@ To simplify and streamline the process of handling, sending and receiving data, 
 
 Packets are validated with [Node Data Validator](https://www.npmjs.com/package/node-data-validator). If a packet fails validation (model and payload fail to compare) the packet will be **dropped**!
 
-There are 2 main components to this module. The handlers (Client or Server) and the packets. Packets are created from a base packet class that handels validation and some base functionality. The handlers handle incomming packets and execute them, if the payload data matches the local defined model. The Model is **not** transmitted over the network.
+There are 2 main components to this module. The handlers (Client or Server) and the packets. Packets are created from a base packet class that handels validation and some base functionality. The handlers handle incoming packets and execute them, if the payload data matches the local defined model. The Model is **not** transmitted over the network.
 
 The server handler also handels client id generation for identification of clients. The uuid module is used for this id generation.
 
@@ -167,6 +167,9 @@ class Ping extends Packet {
     }
 }
 ```
+
+### About message handling
+If a packet was registered via `.addPacket(new ExamplePacket());`, its `handle()`-function gets called on the receiving side. Note that the model has to be the exact same on both Client and Server, but the handle functions can differ (e.g. writing messages into a db on the Server and outputting the message on the Client).
 
 ### Options
 A Server or Client can accept the following options.

@@ -12,7 +12,7 @@ class Packet {
      * Init new Packet Class
      * @param {string} name packet name for identification
      * @param {object} payload packet payload from sender
-     * @param {object} model packet model to validate (With Node-Data-Validator)
+     * @param {object} model packet model to validate (with Node-Data-Validator)
      */
     constructor(name, payload = {}, model = {}) {
 
