@@ -55,7 +55,7 @@ const { Server } = require("node-ws-packets");
     Create Server
 */
 // Active WebSocketServer needed.
-const serverManager = new Server(wss, {log: true});
+const serverManager = new Server(wss, { log: true, keepAlive: true, keepAliveTimeout = 60, keepAliveInterval = 30 });
 
 /*
     Add Packets
@@ -82,6 +82,11 @@ serverManager.onError((ws, error) => {
     console.log(ws.id, error);
 });
 
+// Executed on every invalid packet or message
+serverManager.onInvalid((ws, data) => {
+    console.log(ws.id, data);
+});
+
 /*
     Broadcast Packets to all connected clients
 */
@@ -99,7 +104,7 @@ const { Client } = require("node-ws-packets");
     Client
 */
 // Active Web Socket Connection needed.
-const clientManager = new Client(ws);
+const clientManager = new Client(ws, { log: true, keepAlive: true });
 
 /*
     Add Packets
@@ -121,7 +126,12 @@ clientManager.onDisconnect((ws, event) => {
 });
 
 // Executed on client error
-serverManager.onError((ws, error) => {
+clientManager.onError((ws, error) => {
+    // Same as Server Manager
+});
+
+// Executed on every invalid packet or message
+clientManager.onInvalid((ws, data) => {
     // Same as Server Manager
 });
 
@@ -176,7 +186,10 @@ A Server or Client can accept the following options.
 | Option   | Type    | Description                           | Values            | Default |
 |----------|---------|---------------------------------------|-------------------|---------|
 | log      | boolean | Should the Module auto-log to console?| `true` or `false` | `false`  |
-| reportBroken | boolean | Should the Module report broken packets that are invald | `true` or `false` | `false`  |
+| keepAlive | boolean | Send an integrated Ping Message to the clients to keep the connection alive | `true` or `false` | `false`  |
+| keepAliveTimeout | number | Time a ping packet has to return before the connection is forcefully closed | `any number` | `60`  |
+| keepAliveInterval | number | Time until the next Ping Message is sent to the client after receiving the latest Ping | `any number` | `30`  |
+
 
 
 ### Packet
