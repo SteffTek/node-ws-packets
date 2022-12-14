@@ -26,7 +26,6 @@ module.exports = class CKeepAlivePacket extends Packet {
      * @param {object} ws websocket connection
      */
     handle(ws) {
-        console.log(this);
         ws.sendPacket(new CKeepAlivePacket({ timestamp: this.payload.timestamp }));
     }
 }
